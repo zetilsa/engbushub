@@ -51,7 +51,7 @@
                             </div>
                             <div v-for="product in products" :key="product.id" class="product-card">
                                 <img :src="'http://127.0.0.1:8000/storage/' + product.image[0]" alt="Product Image">
-                                <div>
+                                <div class="product-info">
                                     <h5>{{ product.name }}</h5>
                                     <p class="product-price">Rp{{ (product.price || 0).toLocaleString() }}</p>
                                 </div>
@@ -142,37 +142,61 @@ export default {
 .product-card {
     border: 1px solid #004ddd;
     border-radius: 8px;
-    padding: 10px;
+    padding: 10px 16px;
     background: #fff;
     display: flex;
     align-items: center;
-    gap: 20px; /* Tambahkan jarak antar elemen */
-    margin-bottom: 10px;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
 .product-card img {
     width: 60px;
     height: 60px;
-    border-radius: 5px;
+    border-radius: 6px;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 .product-info {
-    flex-grow: 1; /* Agar teks memenuhi sisa space */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex: 1;
+}
+
+.product-info h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212529;
 }
 
 .product-price {
+    margin-top: 5px;
     font-weight: bold;
     color: #28a745;
+    font-size: 0.95rem;
 }
 
 .dropdown-action {
-    margin-left: auto; /* Pastikan tombol Edit tetap di kanan */
-    margin-right: 10px;
+    margin-left: auto;
 }
+
+.action-btn {
+    border-radius: 6px;
+}
+
+.sidebar-item:hover {
+    background-color: #0056b3 !important;
+    transform: scale(1.05);
+}
+
 
 .action-btn {
     border-radius: 7px;

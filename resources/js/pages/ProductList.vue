@@ -20,7 +20,7 @@
                                 </button>
                                 <div class="d-flex align-items-center text-secondary mt-3">
                                     <i class="bi bi-geo-alt me-1"></i>
-                                    <span>{{ product.user.city.name }}</span>
+                                    <span>{{ product.city }}</span>
                                 </div>
                             </div>
                         </div>
