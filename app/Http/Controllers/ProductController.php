@@ -189,4 +189,76 @@ class ProductController extends Controller
         ]);
     }
 
+  public function update(Request $request, $slug)
+{
+    $product = Product::where('slug', $slug)->firstOrFail();
+
+
+    // Validasi (gunakan sometimes agar hanya memvalidasi field yang dikirim)
+    $validator = Validator::make($request->all(), [
+        'category_id' => 'sometimes|required|exists:categories,id',
+        'name'        => 'sometimes|required|string|max:255',
+        'description' => 'sometimes|nullable|string',
+        'price'       => 'sometimes|required|integer|min:0',
+        'image.*'     => 'sometimes|required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // Update field yang dikirim
+    if ($request->has('name')) {
+        $slug         = Str::slug($request->name);
+        $originalSlug = $slug;
+        $count        = 1;
+
+        while (Product::where('slug', $slug)->where('id', '!=', $product->id)->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        $product->name = $request->name;
+        $product->slug = $slug;
+    }
+
+    if ($request->has('category_id')) {
+        $product->category_id = $request->category_id;
+    }
+
+    if ($request->has('description')) {
+        $product->description = $request->description;
+    }
+
+    if ($request->has('price')) {
+        $product->price = $request->price;
+    }
+
+    // Ganti gambar jika dikirim ulang
+    if ($request->hasFile('image')) {
+        // Hapus gambar lama jika perlu (opsional)
+        $oldImages = json_decode($product->image, true);
+        if (is_array($oldImages)) {
+            foreach ($oldImages as $img) {
+                Storage::disk('public')->delete($img);
+            }
+        }
+
+        $images = [];
+        foreach ($request->file('image') as $file) {
+            $path     = $file->store('products', 'public');
+            $images[] = $path;
+        }
+
+        $product->image = json_encode($images);
+    }
+
+    $product->save();
+
+    return response()->json([
+        'message' => 'Product updated successfully',
+        'product' => $product,
+    ]);
+}
+
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ServiceController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,10 +22,12 @@ Route::get('/provinces', [ProvinceController::class, 'index']);
 
 Route::get('/cities/{province_id}', [CityController::class, 'getCities']);
 
+Route::post('/service/create', [ServiceController::class, 'store'])->middleware('auth:sanctum');
 Route::post('/product/create', [ProductController::class, 'store'])->middleware('auth:sanctum');
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/myProducts', [ProductController::class, 'myProducts'])->middleware('auth:sanctum');
 Route::get('/products/{product:slug}', [ProductController::class, 'show']);
+Route::post('/product/update/{product:slug}', [ProductController::class, 'update'])->middleware('auth:sanctum');
 
 Route::get('categories', [CategoryController::class, 'indexCategory']);
 

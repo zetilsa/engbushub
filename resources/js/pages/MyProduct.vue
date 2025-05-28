@@ -60,7 +60,7 @@
                                     Action
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" @click="editProduct(product)">Edit</a></li>
+                                    <li><router-link class="dropdown-item" :to="`/product/edit/${product.slug}`">Edit</router-link></li>
                                     <li><a class="dropdown-item text-danger" href="#" @click="deleteProduct(product.id)">Delete</a></li>
                                 </ul>
                             </div>
@@ -75,43 +75,58 @@
     </div>
 </template>
 
-<script>
-import axios from 'axios';
-import { onMounted, ref } from 'vue';
+<script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-export default {
-    setup() {
-        const products = ref([]);
-        const token = localStorage.getItem('token'); 
+// State
+const products = ref([])
+const token = localStorage.getItem('token')
 
-        const fetchProducts = async () => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/api/myProducts', {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
+// Ambil daftar produk dari API
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/api/myProducts', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
-        // Perbaiki format image dari JSON string ke array
-        products.value = response.data.map(product => ({
-            ...product,
-            image: JSON.parse(product.image) // Konversi string menjadi array
-        }));
-        
-        console.log("Data produk setelah perbaikan:", products.value);
-    } catch (error) {
-        console.error("Terjadi kesalahan saat fetch product", error);
-    }
-};
+    products.value = response.data.map(product => ({
+      ...product,
+      image: JSON.parse(product.image)
+    }))
+  } catch (error) {
+    console.error('Gagal memuat produk:', error)
+  }
+}
 
+// Hapus produk
+const deleteProduct = async (id) => {
+  const confirmDelete = confirm('Apakah kamu yakin ingin menghapus produk ini?')
+  if (!confirmDelete) return
 
-        onMounted(() => {
-            fetchProducts();
-        });
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/products/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
-        return { products };
-    }
-};
+    // Filter produk yang masih ada
+    products.value = products.value.filter(product => product.id !== id)
+
+    alert('Produk berhasil dihapus!')
+  } catch (error) {
+    console.error('Gagal menghapus produk:', error)
+    alert('Terjadi kesalahan saat menghapus produk.')
+  }
+}
+
+// Panggil saat komponen dimuat
+onMounted(() => {
+  fetchProducts()
+})
 </script>
 
 

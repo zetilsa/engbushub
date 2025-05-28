@@ -12,6 +12,7 @@ import ResetPassword from "../pages/ResetPassword.vue";
 import OTPVerification from "../pages/OTPVerification.vue";
 import VerifyOtpLogin from "../pages/VerifyOtpLogin.vue";
 import ProductDetail from "../pages/ProductDetail.vue";
+import ProductEdit from "../pages/ProductEdit.vue";
 
 const routes = [
     {
@@ -55,6 +56,12 @@ const routes = [
         name: 'createProduct',
         component: ProductCreate,
         meta : {requiresAuth : true, title : "Upload Produk"}
+    },
+    {
+        path: '/product/edit/:slug',
+        name: 'editProduct',
+        component: ProductEdit,
+        meta : {requiresAuth : true, title : "Edit Produk"}
     },
     {
         path: '/forgot-password',

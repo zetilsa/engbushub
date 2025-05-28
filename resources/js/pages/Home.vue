@@ -26,7 +26,7 @@
 
     <!-- Category Cards -->
     <div class="container mt-5 mb-5">
-      <h2 class="text-center mb-4 section-title">Explore Our Services</h2>
+      <h2 class="text-center mb-4 section-title">Jelajahi Layanan Kami</h2>
       <div class="row justify-content-center g-4">
         <div class="col-lg-3 col-md-6 col-6">
           <div class="category-box text-center p-4">
