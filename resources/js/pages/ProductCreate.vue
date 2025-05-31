@@ -27,7 +27,7 @@
                   class="form-control form-control-lg" 
                   id="productName" 
                   v-model="fields.name" 
-                  placeholder="Contoh: Kemeja Flanel Kotak-kotak"
+                  placeholder="Masukkan Nama Produkmu"
                   required
                 >
               </div>
@@ -35,16 +35,29 @@
               <div class="col-md-6 mb-3">
                 <label for="category" class="form-label">Kategori <span class="text-danger">*</span></label>
                 <select 
-                  class="form-select form-select-lg"
-                  id="category"
-                  v-model="fields.category_id"
-                  required
-                >
-                  <option value="" disabled selected>Pilih kategori</option>
-                  <option v-for="category in categories" :key="category.id" :value="category.id">
-                    {{ category.name }}
-                  </option>
-                </select>
+  class="form-select form-select-lg"
+  v-model="fields.category_id"
+  @change="filterSubcategories"
+  required
+>
+  <option value="" disabled selected>Pilih kategori</option>
+  <option v-for="category in categories" :key="category.id" :value="category.id">
+    {{ category.name }}
+  </option>
+</select>
+
+<select 
+  class="form-select form-select-lg mt-3"
+  v-model="fields.subcategory_id"
+  required
+  :disabled="filteredSubcategories.length === 0"
+>
+  <option value="" disabled selected>Pilih subkategori</option>
+  <option v-for="sub in filteredSubcategories" :key="sub.id" :value="sub.id">
+    {{ sub.name }}
+  </option>
+</select>
+
               </div>
             </div>
 
@@ -55,7 +68,7 @@
                 id="description" 
                 v-model="fields.description"
                 rows="4"
-                placeholder="Deskripsikan produk secara detail termasuk bahan, ukuran, dan spesifikasi lainnya"
+                placeholder="Deskripsikan produk secara detail"
                 required
               ></textarea>
               <div class="form-text">Minimal 50 karakter</div>
@@ -195,7 +208,6 @@ export default {
         image: [],
       },
       categories: [],
-      subcategories: [],
       filteredSubcategories: [],
       uploadedImages: [],
       imageUrl: null,
@@ -217,15 +229,13 @@ export default {
     },
 
    filterSubcategories() {
-  console.log("Semua subkategori:", this.subcategories);
-  console.log("Kategori dipilih:", this.fields.category_id);
-
-  this.filteredSubcategories = this.subcategories.filter(
-    sub => sub.category_id == this.fields.category_id
-  );
-
-  console.log("Subkategori hasil filter:", this.filteredSubcategories);
-  this.fields.subcategory_id = '';
+  const selectedCategory = this.categories.find(cat => cat.id == this.fields.category_id);
+  if (selectedCategory && selectedCategory.subcategories) {
+    this.filteredSubcategories = selectedCategory.subcategories;
+  } else {
+    this.filteredSubcategories = [];
+  }
+  this.fields.subcategory_id = ''; // reset subkategori terpilih saat kategori berubah
 },
 
     removeImage(index) {
