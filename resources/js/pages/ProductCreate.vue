@@ -1,107 +1,167 @@
 <template>
-    <div class="container mt-4">
-      <h2>Tambah Produk</h2>
-  
-      <div class="card shadow-sm p-3 mt-3">
-        <div class="card-body">
-          <h5 class="card-title">Informasi Produk</h5>
-          <p>Pastikan produk tidak melanggar Hak Kekayaan Intelektual supaya tidak ditakedown</p>
-  
-          <form @submit.prevent="submitProduct">
-            <!-- Nama Produk -->
-            <div class="mb-3">
-              <label for="productName" class="form-label">Nama Produk</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                id="productName" 
-                v-model="fields.name" 
-                required
-              >
+  <div class="container mt-4">
+    <div class="d-flex align-items-center mb-4">
+      <router-link to="/myproducts" class="btn btn-outline-secondary me-3">
+        <i class="bi bi-arrow-left"></i>
+      </router-link>
+      <h2 class="mb-0">Tambah Produk Baru</h2>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          Pastikan produk tidak melanggar Hak Kekayaan Intelektual supaya tidak ditakedown
+        </div>
+
+        <form @submit.prevent="submitProduct" class="mt-4">
+          <!-- Section 1: Basic Information -->
+          <div class="mb-5">
+            <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-info-square me-2"></i>Informasi Dasar Produk</h5>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="productName" class="form-label">Nama Produk <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control form-control-lg" 
+                  id="productName" 
+                  v-model="fields.name" 
+                  placeholder="Contoh: Kemeja Flanel Kotak-kotak"
+                  required
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="category" class="form-label">Kategori <span class="text-danger">*</span></label>
+                <select 
+                  class="form-select form-select-lg"
+                  id="category"
+                  v-model="fields.category_id"
+                  required
+                >
+                  <option value="" disabled selected>Pilih kategori</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
             </div>
-  
-            <!-- Deskripsi -->
+
             <div class="mb-3">
-              <label for="description" class="form-label">Deskripsi</label>
+              <label for="description" class="form-label">Deskripsi Produk <span class="text-danger">*</span></label>
               <textarea 
                 class="form-control" 
                 id="description" 
                 v-model="fields.description"
-                rows="3"
+                rows="4"
+                placeholder="Deskripsikan produk secara detail termasuk bahan, ukuran, dan spesifikasi lainnya"
                 required
               ></textarea>
+              <div class="form-text">Minimal 50 karakter</div>
             </div>
-  
-            <!-- Harga -->
-            <div class="mb-3">
-              <label for="price" class="form-label">Harga</label>
-              <div class="input-group">
-                <span class="input-group-text">Rp</span>
-                <input
+          </div>
+
+          <!-- Section 2: Pricing -->
+          <div class="mb-5">
+            <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-tag me-2"></i>Harga Produk</h5>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <label for="price" class="form-label">Harga <span class="text-danger">*</span></label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-light">Rp</span>
+                  <input
                     type="number"
                     class="form-control"
-                    placeholder="Masukkan Harga"
+                    placeholder="0"
                     v-model="fields.price"
-                    @input="formatPrice"
-                />
+                    min="0"
+                    required
+                  />
                 </div>
-
-            </div>
-  
-            <!-- Kategori -->
-            <div class="mb-3">
-              <label for="category" class="form-label">Kategori Produk</label>
-              <select 
-                class="form-select"
-                id="category"
-                v-model="fields.category_id"
-                required
-              >
-                <option value="">Pilih kategori</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-  
-            <!-- Upload & Crop Gambar -->
-            <label class="form-label mb-3">Upload Gambar</label>
-            <div class="upload-container mb-3">
-              <div class="upload-box" @click="openFilePicker">
-                <span>+</span>
-                <p>Upload Image</p>
               </div>
-                <input type="file" ref="fileInput" @change="onFileChange" hidden>
-
-                <!-- Preview Images (Setiap Gambar dalam Box Terpisah) -->
-                <div v-if="uploadedImages.length > 0" class="uploaded-images">
-                <div v-for="(img, index) in uploadedImages" :key="index" class="image-preview">
-                  <img :src="img" alt="Preview" class="preview-img">
-                  <button @click="removeImage(index)" class="delete-btn">❌</button>
-                </div>
-                </div>
             </div>
-  
-            <!-- Tombol Submit -->
-            <button type="submit" class="btn btn-primary" :disabled="loading">
-              <span v-if="loading">Mengirim...</span>
-              <span v-else>Tambah Produk</span>
-            </button>
-          </form>
-  
-          <!-- Notifikasi Sukses -->
-          <div v-if="successMessage" class="alert alert-success mt-3">
-            {{ successMessage }}
           </div>
-  
-          <!-- Notifikasi Error -->
-          <div v-if="errorMessage" class="alert alert-danger mt-3">
-            {{ errorMessage }}
+
+          <!-- Section 3: Images -->
+          <div class="mb-4">
+            <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-images me-2"></i>Gambar Produk</h5>
+            
+            <div class="mb-3">
+              <label class="form-label">Upload Gambar <span class="text-danger">*</span></label>
+              <p class="text-muted">Upload minimal 1 gambar (maks. 5 gambar)</p>
+              
+              <div class="d-flex flex-wrap gap-3">
+                <!-- Upload Box -->
+                <div 
+                  class="upload-box d-flex flex-column align-items-center justify-content-center"
+                  @click="openFilePicker"
+                  :class="{ 'disabled': uploadedImages.length >= 5 }"
+                >
+                  <i class="bi bi-plus-lg fs-1 text-muted"></i>
+                  <span class="text-muted">Tambah Gambar</span>
+                  <input type="file" ref="fileInput" @change="onFileChange" accept="image/*" hidden multiple>
+                </div>
+
+                <!-- Image Previews -->
+                <div 
+                  v-for="(img, index) in uploadedImages" 
+                  :key="index" 
+                  class="image-preview position-relative"
+                >
+                  <img :src="img" alt="Preview" class="img-thumbnail">
+                  <button 
+                    @click="removeImage(index)" 
+                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-flex justify-content-between border-top pt-4">
+            <button type="button" class="btn btn-outline-secondary" @click="resetForm">
+              <i class="bi bi-arrow-counterclockwise me-2"></i>Reset Form
+            </button>
+            <button type="submit" class="btn btn-primary px-4" :disabled="loading">
+              <template v-if="loading">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Menyimpan...
+              </template>
+              <template v-else>
+                <i class="bi bi-check-circle me-2"></i>Simpan Produk
+              </template>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div v-if="successMessage" class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center p-5">
+            <div class="text-success mb-4">
+              <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+            </div>
+            <h5 class="mb-3">Produk Berhasil Ditambahkan!</h5>
+            <p>{{ successMessage }}</p>
+            <button class="btn btn-primary" @click="successMessage = ''">
+              Tutup
+            </button>
           </div>
         </div>
       </div>
-  
-      <!-- Modal untuk Crop -->
+      <div class="modal-backdrop fade show"></div>
+    </div>
+
+    <!-- Crop Modal -->
+    <!-- Modal untuk Crop -->
       <div v-if="showModal" class="modal">
       <div class="modal-content">
         <h3>Crop Your Image</h3>
@@ -113,9 +173,10 @@
           <button class="btn cancel" @click="showModal = false">Cancel</button>
         </div>
       </div>
-    </div>
-    </div>
-  </template>
+      </div>
+  </div>
+</template>
+
   
   <script>
 import axios from 'axios';
@@ -127,12 +188,15 @@ export default {
     return {
       fields: {
         category_id: '',
+        subcategory_id: '',
         name: '',
         description: '',
         price: '',
         image: [],
       },
       categories: [],
+      subcategories: [],
+      filteredSubcategories: [],
       uploadedImages: [],
       imageUrl: null,
       showModal: false,
@@ -151,6 +215,19 @@ export default {
     openFilePicker() {
       this.$refs.fileInput.click();
     },
+
+   filterSubcategories() {
+  console.log("Semua subkategori:", this.subcategories);
+  console.log("Kategori dipilih:", this.fields.category_id);
+
+  this.filteredSubcategories = this.subcategories.filter(
+    sub => sub.category_id == this.fields.category_id
+  );
+
+  console.log("Subkategori hasil filter:", this.filteredSubcategories);
+  this.fields.subcategory_id = '';
+},
+
     removeImage(index) {
   this.uploadedImages.splice(index, 1);
   this.fields.image.splice(index, 1);
@@ -222,6 +299,7 @@ preventExit(event) {
   console.log("Isi this.fields.image:", this.fields.image);
 
   formData.append("category_id", this.fields.category_id);
+  formData.append("subcategory_id", this.fields.subcategory_id);
   formData.append("name", this.fields.name);
   formData.append("description", this.fields.description);
   formData.append("price", this.fields.price);
@@ -264,25 +342,43 @@ preventExit(event) {
   }
 },
     resetForm() {
-      this.fields = { category_id: '', name: '', description: '', price: '', image: null };
-      this.uploadedImages = [];
-    },
+  this.fields = { category_id: '', subcategory_id: '', name: '', description: '', price: '', image: [] };
+  this.uploadedImages = [];
+},
+
     async fetchCategories() {
-    try {
-        let response = await axios.get("http://127.0.0.1:8000/api/categories");
-        this.categories = response.data;
-        console.log("Categories:", this.categories); // Cek apakah data masuk
-    } catch (error) {
-        console.error("Error fetching categories:", error);
-    }
+  try {
+    const res = await axios.get("http://127.0.0.1:8000/api/categories");
+    this.categories = res.data;
+  } catch (err) {
+    console.error("Error fetch categories:", err);
+  }
+},
+
+    async fetchSubcategories() {
+  try {
+    if (!this.fields.category_id) return; // Skip jika belum ada kategori terpilih
+    const res = await axios.get(`http://127.0.0.1:8000/api/categories/${this.fields.category_id}/subcategories`);
+    this.subcategories = res.data;
+  } catch (err) {
+    console.error("Error fetch subcategories:", err);
+  }
 }
+
+
   },
   mounted() {
     this.fetchCategories();
+    this.fetchSubcategories();
 
     window.addEventListener("beforeunload", this.preventExit);
     window.addEventListener("popstate", this.preventExit);
   },
+
+  watch: {
+  'fields.category_id': 'filterSubcategories'
+},
+
 
   beforeUnmount() {
   // Hapus event listener saat komponen tidak digunakan lagi
@@ -293,49 +389,27 @@ preventExit(event) {
 </script>
 
   
-  <style scoped>
-.upload-container {
-  display: flex;
-  align-items: center;
+<style scoped>
+/* Improved Form Styling */
+.card {
+  border-radius: 12px;
+  border: none;
 }
 
-.upload-box {
-  width: 150px;
-  height: 150px;
-  border: 2px dashed blue;
-  display: flex;
-  align-items: center;
+.form-control, .form-select {
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.form-control-lg, .form-select-lg {
+  padding: 14px;
+}
+
+.input-group-text {
+  min-width: 45px;
   justify-content: center;
-  flex-direction: column;
-  cursor: pointer;
-  margin-right: 10px; /* Tambahkan sedikit jarak ke kanan */
 }
 
-/* Preview Wrapper: agar semua gambar tampil secara horizontal */
-.preview-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Beri jarak antar gambar */
-}
-
-/* Preview Container: agar setiap gambar punya box sendiri */
-.preview-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ddd;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.preview-img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-/* Modal Styling */
 .modal {
   position: fixed;
   top: 0;
@@ -390,27 +464,62 @@ preventExit(event) {
   color: white;
 }
 
-.delete-btn {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
+/* Upload Box Styling */
+.upload-box {
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-.uploaded-images {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+.upload-box:hover {
+  border-color: #0d6efd;
+  background-color: #f8f9fa;
 }
 
+.upload-box.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Image Preview Styling */
 .image-preview {
-  position: relative;
+  width: 150px;
+  height: 150px;
 }
 
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
 
-  </style>
+/* Crop Modal Styling */
+.crop-container {
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .upload-box, .image-preview {
+    width: 120px;
+    height: 120px;
+  }
   
+  .form-control, .form-select {
+    padding: 10px;
+  }
+}
+
+/* Transition Effects */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
